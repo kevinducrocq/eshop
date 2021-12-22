@@ -7,7 +7,15 @@
         <img src="<?= URLROOT ?>/images/products/<?= $product->img ?>" class="img-fluid" alt="">
     </div>
     <div class="col-md-8">
-        <h1><?= $product->name ?></h1>
+        <div class="d-flex align-items-center">
+            <h1><?= $product->name ?></h1>
+            <?php if ($product->stock <= 0) : ?>
+                <span class="fw-bold badge bg-danger mx-4">Indisponible</span>
+            <?php endif; ?>
+            <?php if ($product->stock > 0) : ?>
+                <span class="fw-bold badge bg-success mx-4"><?= $product->stock ?> en stock</span>
+            <?php endif; ?>
+        </div>
         <p><?= nl2br($product->description) ?></p>
         <hr>
         <div class="row">
@@ -24,7 +32,11 @@
             </div>
         </div>
         <hr>
-        <button class="btn btn-primary float-end btn-lg add_to_cart" data-price="<?= number_format($product->price_ttc, 2) ?>" data-url="<?= URLROOT ?>/carts/add_to_cart/<?= $product->id ?>">Ajouter au panier</button>
+        <?php if ($product->stock <= 0) : ?>
+            <span class="alert alert-danger float-end" disabled>Produit indisponible</span>
+        <?php else : ?>
+            <button class="btn btn-primary float-end btn-lg add_to_cart" data-price="<?= number_format($product->price_ttc, 2) ?>" data-url="<?= URLROOT ?>/carts/add_to_cart/<?= $product->id ?>">Ajouter au panier</button>
+        <?php endif; ?>
     </div>
 
 </div>

@@ -106,4 +106,12 @@ class Cart
             return false;
         }
     }
+
+    public function validate($id)
+    {
+        $this->db->query('UPDATE cart SET status = 1 WHERE id=:id');
+        $this->db->bind(':id', $id);
+        $this->db->execute();
+        return true;
+    }
 }

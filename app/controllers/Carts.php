@@ -44,7 +44,7 @@ class Carts extends Controller
                 <i class="fas fa-shopping-cart"></i>
                 <span class="badge bg-secondary">' . $this->cartModel->getCountProductInCart($_SESSION['cart']) . '</span>
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">';
+                <ul class="dropdown-menu shadow-lg" aria-labelledby="navbarDarkDropdownMenuLink">';
             $total = 0;
             foreach ($cartlines as $cartline) :
                 $total += $cartline->amount;
@@ -82,5 +82,60 @@ class Carts extends Controller
             'cart' => $cart,
         ];
         $this->view('carts/index', $data);
+    }
+
+    public function payment()
+    {
+
+        $cart = isCartExist();
+        $cartlines = currentCart();
+
+        require_once VENDORROOT . 'autoload.php';
+        $key = APISTRIPE;
+        \Stripe\Stripe::setApiKey($key);
+
+        if (isset($_POST['stripeToken'])) {
+
+            $customer = \Stripe\Customer::create([
+                'description' => $_SESSION['user_firstname'],
+                'source' => $_POST['stripeToken'],
+                'email' => $_SESSION['user_email']
+            ]);
+
+            $charge = \Stripe\Charge::create([
+                'amount' => $_POST['total'] * 100,
+                'currency' => 'eur',
+                'customer' => $customer->id,
+            ]);
+
+            if ($charge->status == 'succeeded') {
+                // paiement validé 
+                var_dump($cartlines);
+                foreach ($cartlines as $cartline) {
+
+                    $qty = $cartline->qty;
+                    $id_product = $cartline->id_product;
+                    $product = $this->productModel->getProduct($id_product);
+                    $datas = [
+                        'id' => $product->id,
+                        'stock' => $product->stock - $qty,
+                        'price_ht' => $product->price_ht,
+                        'price_ttc' => $product->price_ttc,
+                        'img' => $product->img,
+                        'description' => $product->description,
+                        'name' => $product->name
+                    ];
+                    $this->productModel->update($datas);
+                }
+                $cart = $this->cartModel->validate($cart->id);
+                unset($_SESSION['cart']);
+            }
+        }
+
+        $data = [
+            'title' => 'Paiement de votre commande',
+            'status' => $charge->status,
+        ];
+        $this->view('carts/payment', $data);
     }
 }

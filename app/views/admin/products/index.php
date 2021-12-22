@@ -138,4 +138,6 @@
         </div>
     </div>
 </div>
+
+<script src="<?php echo URLROOT . '/js/modalAdmin.js'; ?>"></script>
 <?php require APPROOT . '/views/inc/footer.php' ?>

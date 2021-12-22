@@ -40,9 +40,56 @@
         </div>
     </div>
     <div class="col-md-4">
-                        
-
+        <form action="<?= URLROOT ?>/carts/payment" method="post" id="payment-form">
+            <input type="hidden" value="<?= $total ?>" name="total">
+            <div class="bg-secondary p-4 mb-3">
+                <label for="card-element" class="form-label mb-2">Payer avec Stripe</label>
+                <div id="card-element" class="mb-2 bg-white p-2 border border-2"></div>
+                <div id="card-errors" role="alert"></div>
+                <button class="btn btn-success">Payer</button>
+            </div>
+        </form>
     </div>
 </div>
+
+<script src="https://js.stripe.com/v3"></script>
+<script>
+    var stripe = Stripe("pk_test_51Jk8oDCetpwHurzPcGiUml8baZCtsvdo9F3VKLE2qDmWb43dbbk2se5PoP0Eeg7nWjSRcSp5pZ7Q84cn60awmlRG00GrCCOC3F")
+    var element = stripe.elements()
+    var card = element.create('card')
+    card.mount('#card-element')
+
+    card.addEventListener('change', function(e) {
+        var displayError = document.getElementById('card-errors')
+        if (e.error) {
+            displayError.textContent = e.error.message
+        } else {
+            displayError.textContent = ''
+        }
+    })
+
+    var form = document.getElementById('payment-form')
+    form.addEventListener('submit', function(e) {
+        e.preventDefault()
+        stripe.createToken(card).then(function(result) {
+            if (result.error) {
+                var displayError = document.getElementById('card-errors')
+                displayError.textContent = result.error.message
+            } else {
+                stripeTokenHandler(result.token)
+            }
+        })
+    })
+
+    function stripeTokenHandler(token) {
+        var form = document.getElementById('payment-form')
+        var hiddenInput = document.createElement('input')
+        hiddenInput.setAttribute('type', 'hidden')
+        hiddenInput.setAttribute('name', 'stripeToken')
+        hiddenInput.setAttribute('value', token.id)
+        form.appendChild(hiddenInput)
+        form.submit()
+    }
+</script>
 
 <?php require APPROOT . '/views/inc/footer.php' ?>
