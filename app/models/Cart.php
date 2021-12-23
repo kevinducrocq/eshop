@@ -54,6 +54,29 @@ class Cart
         }
     }
 
+    public function getCartByIdUser($id_user)
+    {
+        $this->db->query(
+            'SELECT *
+            FROM cart 
+            WHERE id_user = :id_user AND status = 0'
+        );
+
+        $this->db->bind(':id_user', $id_user);
+        $row = $this->db->single();
+
+        return $row;
+    }
+
+
+    public function associateUserToCart($id_user, $reference)
+    {
+        $this->db->query('UPDATE cart SET id_user = :id_user WHERE reference = :reference');
+        $this->db->bind(':id_user', $id_user);
+        $this->db->bind(':reference', $reference);
+        $this->db->execute();
+        return true;
+    }
 
 
     // récupération du panier actuel

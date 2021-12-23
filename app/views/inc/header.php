@@ -1,3 +1,22 @@
+<?php
+if (isset($_SESSION['user_id'])) :
+
+  if (!getCartByIdUser($_SESSION['user_id'])) { // pas de panier utilisateur
+    if (!isset($_SESSION['cart'])) { // pas de session
+      createCart(); // on crée une session et un panier
+    }
+  } else {
+    unset($_SESSION['cart']);
+    $_SESSION['cart'] = getCartByIdUser($_SESSION['user_id'])->reference;
+  }
+
+else :
+  if (!isset($_SESSION['cart'])) { // pas de session
+    createCart(); // on crée une session et un panier
+  }
+endif;
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -13,7 +32,6 @@
 </head>
 
 <body>
-
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
       <a class="navbar-brand" href="<?= URLROOT ?>">Eshop</a>
@@ -33,9 +51,7 @@
             <a class="nav-link active" href="<?= URLROOT ?>/products">Boutique
             </a>
           </li>
-
         </ul>
-
         <ul class="navbar-nav ms-auto">
           <li class="nav-item cart-link dropdown" data-url="<?= URLROOT ?>/carts/widgetCart">
           </li>
@@ -52,9 +68,7 @@
             </li>
         </ul>
       <?php else : ?>
-
         <ul class=" navbar-nav ms-auto">
-
           <li class="nav-item">
             <a class="nav-link" href="<?= URLROOT ?>/users/register">Incription</a>
           </li>

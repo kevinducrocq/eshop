@@ -1,5 +1,9 @@
 <?php
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 class Carts extends Controller
 {
     public function __construct()
@@ -38,7 +42,15 @@ class Carts extends Controller
     {
         $html = '';
         if (isset($_SESSION['cart'])) {
-            $cart = isCartExist();
+            if (isset($_SESSION['user_id'])) :
+                if ($this->cartModel->getCartByIdUser($_SESSION['user_id'])) {
+                    $cart = $this->cartModel->getCartByIdUser($_SESSION['user_id']);
+                } else {
+                    $cart = isCartExist();
+                }
+            else :
+                $cart = isCartExist();
+            endif;
             $cartlines = currentCart();
             $html .= '<a href="#" class="dropdown-toggle nav-link  id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"">
                 <i class="fas fa-shopping-cart"></i>
@@ -75,6 +87,7 @@ class Carts extends Controller
     {
         $cart = isCartExist();
         $cartlines = currentCart();
+        
 
         $data = [
             'title' => 'Votre commande' . '<br><span class="h5">N° ' . $cart->reference . '</span>',
@@ -110,7 +123,6 @@ class Carts extends Controller
 
             if ($charge->status == 'succeeded') {
                 // paiement validé 
-                var_dump($cartlines);
                 foreach ($cartlines as $cartline) {
 
                     $qty = $cartline->qty;
@@ -128,7 +140,116 @@ class Carts extends Controller
                     $this->productModel->update($datas);
                 }
                 $cart = $this->cartModel->validate($cart->id);
-                unset($_SESSION['cart']);
+
+                $mail = new PHPMailer(true);
+
+                try {
+                    //Server settings
+                    $mail->SMTPDebug = false;                      //Enable verbose debug output
+                    $mail->isSMTP();                                            //Send using SMTP
+                    $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
+                    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+                    $mail->Username   = 'kducrocq.dev@gmail.com';                     //SMTP username
+                    $mail->Password   = '190812Vs@';                               //SMTP password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+                    $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+                    //Recipients
+                    $mail->setFrom('kducrocq.dev@gmail.com', 'eshop');
+                    $mail->addAddress($_SESSION['user_email']);     //Add a recipient
+                    // $mail->addReplyTo('kducrocq.dev@gmail.com', 'Eshop');
+                    // $mail->addCC('cc@example.com');
+                    // $mail->addBCC('bcc@example.com');
+
+                    // //Attachments
+                    // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+                    // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+                    //Content
+                    $mail->isHTML(true);                                  //Set email format to HTML
+                    $mail->Subject = 'Confirmation de votre commande';
+
+                    // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+                    $html = '<style type="text/css">
+                    body,
+                    html, 
+                    .body {
+                      background: #f3f3f3 !important;
+                    }
+                  </style>
+                  <!-- move the above styles into your custom stylesheet -->
+                  
+                  <spacer size="16"></spacer>
+                  
+                  <container>
+                  
+                    <spacer size="16"></spacer>
+                  
+                    <row>
+                      <columns>
+                        <h1>Thanks for your order.</h1>
+                        <p>Thanks for shopping with us! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad earum ducimus, non, eveniet neque dolores voluptas architecto sed, voluptatibus aut dolorem odio. Cupiditate a recusandae, illum cum voluptatum modi nostrum.</p>
+                  
+                        <spacer size="16"></spacer>
+                  
+                        <callout class="secondary">
+                          <row>
+                            <columns large="6">
+                              <p>
+                                <strong>Payment Method</strong><br/>
+                                Dubloons
+                              </p>
+                              <p>
+                                <strong>Email Address</strong><br/>
+                                thecapn@pirates.org
+                              </p>
+                              <p>
+                                <strong>Order ID</strong><br/>';
+
+                    $html .= $_SESSION['cart'];
+                    $html .= '</p>
+                    </columns>
+                    <columns large="6">
+                      <p>
+                        <strong>Shipping Method</strong><br/>
+                        Boat (1&ndash;2 weeks)<br/>
+                        <strong>Shipping Address</strong><br/>
+                        Captain Price<br/>
+                        123 Maple Rd<br/>
+                        Campbell, CA 95112
+                      </p>
+                    </columns>
+                  </row>
+                </callout>
+          
+                <h4>Order Details</h4>
+          
+                <table>';
+
+                    $total = 0;
+                    foreach ($cartlines as $cartline) {
+                        $total += $cartline->amount;
+                        $html .= '<tr><th>' . $product = $this->productModel->getProduct($cartline->id_product)->name . '</th><th>' . $cartline->qty . '</th><th>' . number_format($cartline->amount, 2) . '&euro;</th></tr>';
+                    }
+
+                    $html .= '<tr>
+                <td colspan="2"><b>Total</b></td>
+                <td>' . number_format($total, 2) . '&euro;</td>
+              </tr>
+            </table>
+      
+            <hr/>
+            </columns>
+            </row>
+            </container>
+            ';
+                    $mail->Body = $html;
+                    $mail->send();
+                    unset($_SESSION['cart']);
+                    // echo 'Message has been sent';
+                } catch (Exception $e) {
+                    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                }
             }
         }
 

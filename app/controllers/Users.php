@@ -183,7 +183,7 @@ class Users extends Controller
         $_SESSION['user_firstname'] = $user->firstname;
         $_SESSION['user_lastname'] = $user->lastname;
         $_SESSION['user_role'] = $user->id_role;
-        $cart = $this->cartModel->createCart();
+        $cart = $this->cartModel->associateUserToCart($user->id, $_SESSION['cart']);
 
         redirect('pages/index');
     }

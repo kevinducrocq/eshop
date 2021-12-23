@@ -13,6 +13,23 @@ function isCartExist()
     }
 }
 
+function createCart()
+{
+    $cart = new Cart();
+    $cart->createCart();
+}
+
+function getCartByIdUser()
+{
+    $cart = new Cart();
+    $cart = $cart->getCartByIdUser($_SESSION['user_id']);
+    if ($cart) {
+        return $cart;
+    } else {
+        return false;
+    }
+}
+
 function currentCart()
 {
     if (isset($_SESSION['cart'])) {
