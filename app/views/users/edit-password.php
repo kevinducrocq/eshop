@@ -12,19 +12,16 @@
                 <div class="mb-3">
                     <label for="old_password" class="form-label fw-bold">Ancier mot de passe<sup>*</sup></label>
                     <input name="old_password" type="password" class="form-control <?= (!empty($data['old_password_err'])) ? 'is-invalid' : '' ?>">
-                    <span class="invalid-feedback"><?= $data['old_password_err'] ?></span>
                 </div>
 
                 <div class="mb-3">
                     <label for="new_password" class="form-label fw-bold">Nouveau mot de passe<sup>*</sup></label>
                     <input name="new_password" type="password" class="form-control <?= (!empty($data['new_password_err'])) ? 'is-invalid' : '' ?>">
-                    <span class="invalid-feedback"><?= $data['new_password_err'] ?></span>
                 </div>
 
                 <div class="mb-3">
                     <label for="confirm_new_password" class="form-label fw-bold">Confirmez le nouveau mot de passe<sup>*</sup></label>
                     <input name="confirm_new_password" type="password" class="form-control <?= (!empty($data['confirm_new_password_err'])) ? 'is-invalid' : '' ?>">
-                    <span class="invalid-feedback"><?= $data['confirm_new_password_err'] ?></span>
                 </div>
 
                 <input type="submit" class="btn btn-primary form-control" value="Modifier">

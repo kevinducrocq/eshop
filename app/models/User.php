@@ -31,7 +31,7 @@ class User
 
     // vérification email / pseudo / password
 
-    public function login($email,$password)
+    public function login($email, $password)
     {
         // requête préparée
         $this->db->query('SELECT * FROM users WHERE email=:email');

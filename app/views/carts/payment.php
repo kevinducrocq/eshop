@@ -5,7 +5,7 @@
 
 <?php if ($data['status'] == 'succeeded') : ?>
     <div class="alert alert-success">
-        <span>Féliciations, votre paiement à été accepté, merci pour votre achat !</span>
+        <span>Féliciations, votre paiement à été accepté, vous allez reçevoir un email avec le détail</span>
     </div>
 <?php endif; ?>
 

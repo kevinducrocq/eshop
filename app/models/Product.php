@@ -9,6 +9,7 @@ class Product
         $this->db = new Database();
     }
 
+    // Récupère tous les produits
     public function getProducts()
     {
         $this->db->query('SELECT * FROM products ORDER BY id DESC');
@@ -17,15 +18,7 @@ class Product
         return $result;
     }
 
-    public function getActiveProducts()
-    {
-        $this->db->query('SELECT * FROM products WHERE suppr=:suppr ORDER BY id DESC');
-        $this->db->bind(':suppr', 0);
-        $result = $this->db->resultSet();
-
-        return $result;
-    }
-
+    // Récupère UN produit par son ID
     public function getProduct($id)
     {
         $this->db->query('SELECT * FROM products WHERE id=:id');
@@ -36,6 +29,7 @@ class Product
         return $row;
     }
 
+    //Ajout d'un nouveau produit
     public function add($datas)
     {
         $this->db->query('INSERT INTO products (name,description,price_ht,price_ttc,stock,img,created_at) VALUES (:name,:description,:price_ht,:price_ttc,:stock,:img,:created_at)');
@@ -54,6 +48,7 @@ class Product
         }
     }
 
+    // Mise à jour d'un produit
     public function update($datas)
     {
         $this->db->query(
@@ -105,6 +100,7 @@ class Product
         }
     }
 
+    // réactive le produit
     public function activate($id)
     {
         $this->db->query('UPDATE products SET suppr=:suppr WHERE id = :id');

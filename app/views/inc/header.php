@@ -6,7 +6,6 @@ if (isset($_SESSION['user_id'])) :
       createCart(); // on crée une session et un panier
     }
   } else {
-    unset($_SESSION['cart']);
     $_SESSION['cart'] = getCartByIdUser($_SESSION['user_id'])->reference;
   }
 
@@ -15,6 +14,7 @@ else :
     createCart(); // on crée une session et un panier
   }
 endif;
+
 ?>
 
 <!DOCTYPE html>
@@ -59,6 +59,7 @@ endif;
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Bienvenue <?= $_SESSION['user_lastname'] . ' ' . $_SESSION['user_firstname']; ?></a>
               <div class="dropdown-menu">
+                <a href="<?= URLROOT ?>/users/profile" class="dropdown-item">Profil</a>
                 <?php if ($_SESSION['user_role'] && $_SESSION['user_role'] == 1) : ?>
                   <a class="dropdown-item" href="<?= URLROOT ?>/admin">Administration</a>
                   <div class="dropdown-divider"></div>
@@ -85,6 +86,5 @@ endif;
   <div class="notifications">
 
   </div>
-
 
   <main class="container mt-5">

@@ -13,6 +13,8 @@ class Carts extends Controller
         $this->userModel = $this->model('User');
     }
 
+
+    // Ajouter des produits au panier
     public function add_to_cart($id)
     {
         if ($this->cartModel->alreadyInCart($id)) {
@@ -38,19 +40,21 @@ class Carts extends Controller
         return true;
     }
 
+
+    // Afficher le panier
     public function widgetCart()
     {
         $html = '';
-        if (isset($_SESSION['cart'])) {
-            if (isset($_SESSION['user_id'])) :
-                if ($this->cartModel->getCartByIdUser($_SESSION['user_id'])) {
-                    $cart = $this->cartModel->getCartByIdUser($_SESSION['user_id']);
-                } else {
-                    $cart = isCartExist();
-                }
-            else :
-                $cart = isCartExist();
-            endif;
+
+        if (isset($_SESSION['user_id'])) {
+            if ($this->cartModel->getCartByIdUser($_SESSION['user_id'])) {
+
+            $this->cartModel->getCartByIdUser($_SESSION['user_id']);
+            
+            } else {
+                isCartExist();
+            }
+
             $cartlines = currentCart();
             $html .= '<a href="#" class="dropdown-toggle nav-link  id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"">
                 <i class="fas fa-shopping-cart"></i>
@@ -83,20 +87,20 @@ class Carts extends Controller
         }
     }
 
+    // Page du panier
     public function index()
     {
         $cart = isCartExist();
         $cartlines = currentCart();
-        
 
         $data = [
             'title' => 'Votre commande' . '<br><span class="h5">N° ' . $cart->reference . '</span>',
             'cartlines' => $cartlines,
-            'cart' => $cart,
         ];
         $this->view('carts/index', $data);
     }
 
+    //Page de paiement + fonctions
     public function payment()
     {
 

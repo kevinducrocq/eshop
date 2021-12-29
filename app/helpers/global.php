@@ -3,6 +3,7 @@
 require_once '../app/models/Cart.php';
 require_once '../app/models/Product.php';
 
+// Est-ce que le panier existe ?
 function isCartExist()
 {
     if (isset($_SESSION['cart'])) {

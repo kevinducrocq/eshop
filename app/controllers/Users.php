@@ -188,6 +188,22 @@ class Users extends Controller
         redirect('pages/index');
     }
 
+
+    public function index()
+    {
+        $users = $this->userModel->getUsers();
+        $orders = $this->cartModel->getCartByIdUser($_SESSION['user_id']);
+
+        $data = [
+            'users' => $users,
+            'orders' => $orders
+        ];
+
+        $this->view('users/profile', $data);
+    }
+
+
+
     // méthode pour la déconnexion
     public function logout()
     {

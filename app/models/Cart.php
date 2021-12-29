@@ -7,36 +7,7 @@ class Cart
     {
         $this->db = new Database;
     }
-
-    public function add($data)
-    {
-        $this->db->query('INSERT INTO cartline (id_product, id_cart, qty, amount) VALUES (:id_product, :id_cart, :qty, :amount)');
-        $this->db->bind(':id_product', $data['id_product']);
-        $this->db->bind(':id_cart', $data['id_cart']);
-        $this->db->bind(':qty', $data['qty']);
-        $this->db->bind(':amount', $data['amount']);
-
-        if ($this->db->execute()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function update($data)
-    {
-        $this->db->query('UPDATE cartline SET amount = :amount, qty = :qty WHERE id_product = :id_product');
-        $this->db->bind(':amount', $data['amount']);
-        $this->db->bind(':qty', $data['qty']);
-        $this->db->bind(':id_product', $data['id_product']);
-
-        if ($this->db->execute()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
+    
     // creéation du panier
     public function createCart()
     {
@@ -54,6 +25,38 @@ class Cart
         }
     }
 
+    // Ajout des produits au panier
+    public function add($data)
+    {
+        $this->db->query('INSERT INTO cartline (id_product, id_cart, qty, amount) VALUES (:id_product, :id_cart, :qty, :amount)');
+        $this->db->bind(':id_product', $data['id_product']);
+        $this->db->bind(':id_cart', $data['id_cart']);
+        $this->db->bind(':qty', $data['qty']);
+        $this->db->bind(':amount', $data['amount']);
+
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Mise à jour du panier
+    public function update($data)
+    {
+        $this->db->query('UPDATE cartline SET amount = :amount, qty = :qty WHERE id_product = :id_product');
+        $this->db->bind(':amount', $data['amount']);
+        $this->db->bind(':qty', $data['qty']);
+        $this->db->bind(':id_product', $data['id_product']);
+
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Récupération Cart non payé par user_id
     public function getCartByIdUser($id_user)
     {
         $this->db->query(
@@ -64,11 +67,11 @@ class Cart
 
         $this->db->bind(':id_user', $id_user);
         $row = $this->db->single();
-
         return $row;
     }
 
 
+    // Associe le panier au USER quand connexion
     public function associateUserToCart($id_user, $reference)
     {
         $this->db->query('UPDATE cart SET id_user = :id_user WHERE reference = :reference');
@@ -94,7 +97,7 @@ class Cart
         return $row;
     }
 
-    //tous les éléments du panier
+    //tous les éléments du panier en fonction de la référence
     public function getAllLineInCart($reference)
     {
         $cart = $this->getCurrentCart($reference);
@@ -103,7 +106,7 @@ class Cart
         return $this->db->resultSet();
     }
 
-    // Nombre de lignes par élément
+    // Nombre de produits dans le panier en fonction de la référence
     public function getCountProductInCart($reference)
     {
         $cart = $this->getCurrentCart($reference);
@@ -130,6 +133,7 @@ class Cart
         }
     }
 
+    // Cart payé
     public function validate($id)
     {
         $this->db->query('UPDATE cart SET status = 1 WHERE id=:id');
